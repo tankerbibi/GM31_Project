@@ -16,7 +16,14 @@
 using namespace DirectX;
 
 
+#include "DirectXTex.h"
 
+#if _DEBUG
+// libはコンパイル済みのファイル。
+#pragma comment(lib, "DirectXTex_Debug.lib")
+#else
+#pragma comment(lib, "DirectXTex_Release.lib")
+#endif
 
 
 
@@ -25,6 +32,17 @@ using namespace DirectX;
 
 #define SCREEN_WIDTH	(1280)
 #define SCREEN_HEIGHT	(720)
+
+
+
+#define SAFE_RELEASE(o)        \
+do {                           \
+    if (o) {                   \
+        (o)->Release();        \
+        (o) = nullptr;         \
+    }                          \
+} while (0)
+
 
 
 HWND GetWindow();
