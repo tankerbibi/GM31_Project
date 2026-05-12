@@ -8,7 +8,7 @@ public:
 	float x, y, z;
 
 	Vector3() {}
-
+	
 	// Copy constructor
 
 	Vector3(const Vector3& a) : x(a.x), y(a.y), z(a.z) {}

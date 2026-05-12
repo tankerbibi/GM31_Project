@@ -3,40 +3,61 @@
 #include "renderer.h"
 #include "polygon2D.h"
 #include "field.h"
+#include "camera.h"
 
-Polygon2D* g_Polygon2D;
-Field* g_Field;
+// staticメンバ変数は、.cpp側で宣言する必要がある。
+std::list<GameObject*> Manager::m_GameObjects;
 
 void Manager::Init()
 {
 	Renderer::Init();
-	g_Polygon2D = new Polygon2D();
-	g_Polygon2D->Init();
-	g_Field = new Field();
-	g_Field->Init();
+
+	GameObject* gameObject;
+
+	gameObject = new Camera();
+	gameObject->Init();
+	m_GameObjects.push_back(gameObject);
+
+
+	gameObject = new Field();
+	gameObject->Init();
+	m_GameObjects.push_back(gameObject);
+
+	gameObject = new Polygon2D();
+	gameObject->Init();
+	m_GameObjects.push_back(gameObject);
 }
 
 
 void Manager::Uninit()
 {
-	g_Polygon2D->Uninit();
-	delete g_Polygon2D;
-	g_Field->Uninit();
-	delete g_Field;
+	for (GameObject* gameObject : m_GameObjects)
+	{
+		gameObject->Uninit();
+		delete gameObject;
+	}
+
 	Renderer::Uninit();
 }
 
 void Manager::Update()
 {
-	g_Polygon2D->Update();
-	g_Field->Update();
+	// タスクシステム
+	for (GameObject* gameObject : m_GameObjects)
+	{
+		// ポリモーフィズム
+		gameObject->Update();
+	}
 }
 
 void Manager::Draw()
 {
 	Renderer::Begin();
 
-	g_Polygon2D->Draw();
-	g_Field->Draw();
+	for (GameObject* gameObject : m_GameObjects)
+	{
+		gameObject->Draw();
+	}
+
 	Renderer::End();
 }

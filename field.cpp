@@ -3,77 +3,53 @@
 
 using namespace DirectX;
 
-struct VERTEX
-{
-    XMFLOAT3 Position;
-    XMFLOAT2 TexCoord;
-};
-
 void Field::Init()
 {
-    // 初期値
-    m_Position = Vector3(0.0f, 0.0f, 0.0f);
-    m_Rotation = Vector3(0.0f, 0.0f, 0.0f);
-    m_Scale = Vector3(1.0f, 1.0f, 1.0f);
+    VERTEX_3D vertex[4];
 
-    // ================================
-    // 頂点バッファ作成
-    // ================================
-    VERTEX vertex[] =
-    {
-        { XMFLOAT3(-1.0f,  1.0f, 0.0f), XMFLOAT2(0.0f, 0.0f) },
-        { XMFLOAT3(1.0f,  1.0f, 0.0f), XMFLOAT2(1.0f, 0.0f) },
-        { XMFLOAT3(-1.0f, -1.0f, 0.0f), XMFLOAT2(0.0f, 1.0f) },
-        { XMFLOAT3(1.0f, -1.0f, 0.0f), XMFLOAT2(1.0f, 1.0f) },
-    };
+    vertex[0].Position = XMFLOAT3(-30.0f, 0.0f, 30.0f);
+    vertex[0].Normal = XMFLOAT3(0.0f, 1.0f, 0.0f);
+    vertex[0].Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+    vertex[0].TexCoord = XMFLOAT2(0.0f, 0.0f);
+
+    vertex[1].Position = XMFLOAT3(30.0f, 0.0f, 30.0f);
+    vertex[1].Normal = XMFLOAT3(0.0f, 1.0f, 0.0f);
+    vertex[1].Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+    vertex[1].TexCoord = XMFLOAT2(10.0f, 0.0f);
+
+    vertex[2].Position = XMFLOAT3(-30.0f, 0.0f, -30.0f);
+    vertex[2].Normal = XMFLOAT3(0.0f, 1.0f, 0.0f);
+    vertex[2].Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+    vertex[2].TexCoord = XMFLOAT2(0.0f, 10.0f);
+
+    vertex[3].Position = XMFLOAT3(30.0f, 0.0f, -30.0f);
+    vertex[3].Normal = XMFLOAT3(0.0f, 1.0f, 0.0f);
+    vertex[3].Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+    vertex[3].TexCoord = XMFLOAT2(10.0f, 10.0f);
 
     D3D11_BUFFER_DESC bd{};
     bd.Usage = D3D11_USAGE_DEFAULT;
-    bd.ByteWidth = sizeof(VERTEX) * 4;
+    bd.ByteWidth = sizeof(VERTEX_3D) * 4;
     bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+    bd.CPUAccessFlags = 0;
 
     D3D11_SUBRESOURCE_DATA sd{};
     sd.pSysMem = vertex;
 
-    HRESULT hr = Renderer::GetDevice()->CreateBuffer(&bd, &sd, &m_VertexBuffer);
-    assert(SUCCEEDED(hr));
+    Renderer::GetDevice()->CreateBuffer(&bd, &sd, &m_VertexBuffer);
 
-    // ================================
-    // シェーダ作成
-    // ================================
-    Renderer::CreateVertexShader(
-        &m_VertexShader,
-        &m_VertexLayout,
-        "shader/fieldVS.cso"
-    );
+    Renderer::CreateVertexShader(&m_VertexShader, &m_VertexLayout,
+	    "shader\\unlitTextureVS.cso");
 
-    Renderer::CreatePixelShader(
-        &m_PixelShader,
-        "shader/fieldPS.cso"
-    );
+    Renderer::CreatePixelShader(&m_PixelShader,
+	    "shader\\unlitTexturePS.cso");
 
-    // ================================
-    // テクスチャ読み込み
-    // ================================
     TexMetadata metadata;
     ScratchImage image;
+    HRESULT hr = LoadFromWICFile(L"asset\\texture\\Block_Fragile.png", WIC_FLAGS_NONE, &metadata, image);
+    CreateShaderResourceView(Renderer::GetDevice(), image.GetImages(), image.GetImageCount(), metadata, &m_Texture);
 
-    hr = LoadFromWICFile(
-        L"asset\\texture\\Block_Fragile.jpg",
-        WIC_FLAGS_NONE,
-        &metadata,
-        image
-    );
-    assert(SUCCEEDED(hr));
-
-    hr = CreateShaderResourceView(
-        Renderer::GetDevice(),
-        image.GetImages(),
-        image.GetImageCount(),
-        metadata,
-        &m_Texture
-    );
-    assert(SUCCEEDED(hr));
+    assert(m_Texture);
 }
 
 void Field::Uninit()
@@ -92,22 +68,35 @@ void Field::Update()
 
 void Field::Draw()
 {
-    ID3D11DeviceContext* dc = Renderer::GetDeviceContext();
+    Renderer::GetDeviceContext()->IASetInputLayout(m_VertexLayout);
 
-    // 頂点バッファ設定
-    UINT stride = sizeof(VERTEX);
+    Renderer::GetDeviceContext()->VSSetShader(m_VertexShader, nullptr, 0);
+    Renderer::GetDeviceContext()->PSSetShader(m_PixelShader, nullptr, 0);
+
+    // マトリクス設定
+    XMMATRIX world, scale, rot, trans;
+    scale = XMMatrixScaling(m_Scale.x, m_Scale.y, m_Scale.z);
+    rot = XMMatrixRotationRollPitchYaw(m_Rotation.x, m_Rotation.y, m_Rotation.z);
+    trans = XMMatrixTranslation(m_Position.x, m_Position.y, m_Position.z);
+    world = scale * rot * trans;
+
+    Renderer::SetWorldMatrix(world);
+
+    // マテリアル設定
+    MATERIAL material{};
+    material.Diffuse = { 1.0f, 1.0f, 1.0f, 1.0f };
+    material.TextureEnable = true;
+    Renderer::SetMaterial(material);
+
+    Renderer::GetDeviceContext()->PSSetShaderResources(0, 1, &m_Texture);
+
+    //頂点バッファ設定
+    UINT stride = sizeof(VERTEX_3D);
     UINT offset = 0;
-    dc->IASetVertexBuffers(0, 1, &m_VertexBuffer, &stride, &offset);
-    dc->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-    dc->IASetInputLayout(m_VertexLayout);
+    Renderer::GetDeviceContext()->IASetVertexBuffers(0, 1, &m_VertexBuffer, &stride, &offset);
 
-    // シェーダ設定
-    dc->VSSetShader(m_VertexShader, nullptr, 0);
-    dc->PSSetShader(m_PixelShader, nullptr, 0);
-
-    // テクスチャ設定
-    dc->PSSetShaderResources(0, 1, &m_Texture);
-
-    // 描画
-    dc->Draw(4, 0);
+    // ブリミティブトボロジ設定
+    Renderer::GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+    //ボリゴン描画
+    Renderer::GetDeviceContext()->Draw(4, 0);
 }

@@ -1,7 +1,8 @@
 #pragma once
 #include "main.h"
+#include "gameObject.h"
 
-class Polygon2D
+class Polygon2D : public GameObject
 {
 private:
 	ID3D11Buffer * m_VertexBuffer;
@@ -13,8 +14,8 @@ private:
 	ID3D11ShaderResourceView* m_Texture;
 
 public:
-	void Init();
-	void Uninit();
-	void Update();
-	void Draw();
+	void Init() override;
+	void Uninit() override;
+	void Update() override;
+	void Draw() override;
 };

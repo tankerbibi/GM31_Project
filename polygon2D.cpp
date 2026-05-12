@@ -45,7 +45,7 @@ void Polygon2D::Init()
 
 	TexMetadata metadata;
 	ScratchImage image;
-	HRESULT hr = LoadFromWICFile(L"asset\\texture\\Block_Fragile.png", WIC_FLAGS_NONE, &metadata, image);
+	HRESULT hr = LoadFromWICFile(L"asset\\texture\\Block_Orrange.png", WIC_FLAGS_NONE, &metadata, image);
 	CreateShaderResourceView(Renderer::GetDevice(), image.GetImages(), image.GetImageCount(), metadata, &m_Texture);
 
 	assert(m_Texture);
