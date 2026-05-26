@@ -1,7 +1,6 @@
 #pragma once
 #include <list>
-
-class GameObject;
+#include "gameObject.h"
 
 class Manager
 {
@@ -14,4 +13,13 @@ public:
 	static void Update();
 	static void Draw();
 
+	// テンプレートは、わざわざそれ専用の関数を作っている。多用しすぎると、Exeファイルがでっかくなる。
+	template <typename T>
+	static T* AddGameObject()
+	{
+		T* gameObject = new T();
+		gameObject->Init();
+		m_GameObjects.push_back(gameObject);
+		return gameObject;
+	}
 };

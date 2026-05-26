@@ -3,15 +3,20 @@
 
 void Camera::Init()
 {
-	m_Position = {0.0f, 3.0f, -5.0f};
+	m_Position = {0.0f, 5.0f, -10.0f};
 	m_Target = {0.0f, 0.0f, 0.0f};
+	GameObject::Init();
 }
 
 void Camera::Uninit()
-{}
+{
+	GameObject::Uninit();
+}
 
 void Camera::Update()
-{}
+{
+	GameObject::Update();
+}
 
 void Camera::Draw()
 {
@@ -26,4 +31,6 @@ void Camera::Draw()
 		XMLoadFloat3(&up));
 
 	Renderer::SetViewMatrix(view);
+
+	GameObject::Draw();
 }

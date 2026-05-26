@@ -4,7 +4,7 @@
 
 class InputManager
 {
-private:
+public:
 	enum class GameAction
 	{
 		MoveX,

@@ -5,8 +5,8 @@
 #include <thread>
 
 // Lをつけると、マルチバイトセットはいらない。
-const wchar_t* CLASS_NAME = L"AppClass";
-const wchar_t* WINDOW_NAME = L"DX11ゲーム";
+const char* CLASS_NAME ="AppClass";
+const char* WINDOW_NAME = "DX11ゲーム";
 
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
