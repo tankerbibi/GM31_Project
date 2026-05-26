@@ -1,5 +1,8 @@
 #include "camera.h"
 #include "renderer.h"
+#include "manager.h"
+#include "player.h"
+#include "input.h"
 
 void Camera::Init()
 {
@@ -16,6 +19,23 @@ void Camera::Uninit()
 void Camera::Update()
 {
 	GameObject::Update();
+	Player* player = Manager::GetGameObject<Player>();
+	Vector3 playerPos = player->GetPosition();
+
+	float dt = 1.0f / 60.0f;
+
+	// キー入力で回転
+	if (Input::GetKeyPress(VK_RIGHT))
+		m_Rotation.y += 3.0f * dt;
+	if (Input::GetKeyPress(VK_LEFT))
+		m_Rotation.y -= 3.0f * dt;
+	
+	// 線形補完
+	float t = 0.1f;
+	m_Target = m_Target * (1.0f - t) + (playerPos + Vector3(0.0f, 2.0f, 0.0f)) * t;
+	//m_Target = playerPos + Vector3(0.0f, 2.0f, 0.0f);
+
+	m_Position = m_Target + Vector3(-sinf(m_Rotation.y) * 10.0f, 5.0f, -cosf(m_Rotation.y) * 10.0f);
 }
 
 void Camera::Draw()

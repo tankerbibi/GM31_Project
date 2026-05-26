@@ -22,4 +22,18 @@ public:
 		m_GameObjects.push_back(gameObject);
 		return gameObject;
 	}
+
+	template <typename T>
+	static T* GetGameObject()
+	{
+		for (GameObject* gameObject : m_GameObjects)
+		{
+			T* casted = dynamic_cast<T*>(gameObject);  // RTTI（実行時型情報）を利用して、GameObjectをT型にキャスト
+			if (casted != nullptr)
+			{
+				return casted;
+			}
+		}
+		return nullptr;
+	}
 };

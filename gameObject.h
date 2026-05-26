@@ -15,6 +15,7 @@ protected:
 
 public:
 	void SetPosition(const Vector3& Position) { m_Position = Position; }
+	Vector3 GetPosition() { return m_Position; }
 
 	virtual void Init() {}
 	virtual void Uninit()
@@ -47,5 +48,35 @@ public:
 		component->Init();
 		m_Components.push_back(component);
 		return component;
+	}
+
+	virtual Vector3 GetForward()
+	{
+		XMMATRIX rot = XMMatrixRotationRollPitchYaw(m_Rotation.x, m_Rotation.y, m_Rotation.z);
+
+		Vector3 forward;
+		// [2]でZ成分のベクトルを取得することができる。 前方向
+		XMStoreFloat3((XMFLOAT3*)&forward, rot.r[2]);
+		return forward;
+	}
+
+	virtual Vector3 GetRight()
+	{
+		XMMATRIX rot = XMMatrixRotationRollPitchYaw(m_Rotation.x, m_Rotation.y, m_Rotation.z);
+
+		Vector3 forward;
+		// [0]でX成分のベクトルを取得することができる 右方向
+		XMStoreFloat3((XMFLOAT3*)&forward, rot.r[0]);
+		return forward;
+	}
+
+	virtual Vector3 GetUp()
+	{
+		XMMATRIX rot = XMMatrixRotationRollPitchYaw(m_Rotation.x, m_Rotation.y, m_Rotation.z);
+
+		Vector3 forward;
+		// [1]でY成分のベクトルを取得することができる 上方向
+		XMStoreFloat3((XMFLOAT3*)&forward, rot.r[1]);
+		return forward;
 	}
 };

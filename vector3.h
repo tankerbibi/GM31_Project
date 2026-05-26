@@ -105,6 +105,13 @@ public:
 		}
 	}
 
+	static Vector3 cross(Vector3& a, Vector3& b) 
+	{
+		return Vector3(a.y * b.z - a.z * b.y,
+			a.z * b.x - a.x * b.z,
+			a.x * b.y - a.y * b.x);
+	}
+
 	// Vector dot product.  We overload the standard
 	// multiplication symbol to do this
 

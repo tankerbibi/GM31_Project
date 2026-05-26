@@ -3,6 +3,8 @@
 #include "renderer.h"
 #include "modelRenderer.h"
 #include "inputManager.h"
+#include "manager.h"
+#include "camera.h"
 
 //m_Position.x += InputManager::IsPressed(InputManager::GameAction::MoveX) * dt;
 using namespace DirectX;
@@ -33,19 +35,32 @@ void Player::Update()
     // 物理の判定は固定フレームレートがおすすめ。描画は可変フレームレートでもよいけど。
     float dt = 1.0f / 60.0f;
 
+    Camera* camera = Manager::GetGameObject<Camera>();
+    Vector3 forward = camera->GetForward();
+    Vector3 right = camera->GetRight();
+
+    forward.y = 0.0f;
+    forward.normalize();
+
+    right.y = 0.0f;
+    right.normalize();
 
     if (Input::GetKeyPress('D'))
-        m_Velocity.x += 40.0f * dt;
+        m_Velocity += right * 40.0f * dt;
     if (Input::GetKeyPress('A'))
-        m_Velocity.x -= 40.0f * dt;
+        m_Velocity -= right * 40.0f * dt;
     if (Input::GetKeyPress('W'))
-        m_Velocity.z += 40.0f * dt;
+        m_Velocity += forward * 40.0f * dt;
     if (Input::GetKeyPress('S'))
-        m_Velocity.z -= 40.0f * dt;
+        m_Velocity -= forward *  40.0f * dt;
+
+    // 移動方向に回転
+    m_Rotation.y = atan2f(m_Velocity.x, m_Velocity.z);
 
     if (Input::GetKeyTrigger(VK_SPACE))
         m_Velocity.y += 20.0f;  // 撃力（瞬間的な力）
 
+    // 重力
     m_Velocity.y += -60.0f * dt;
 
     m_Velocity.x += -m_Velocity.x * 5.0f * dt;
@@ -75,7 +90,7 @@ void Player::Draw()
     // マトリクス設定
     XMMATRIX world, scale, rot, trans;
     scale = XMMatrixScaling(m_Scale.x, m_Scale.y, m_Scale.z);
-    rot = XMMatrixRotationRollPitchYaw(m_Rotation.x, m_Rotation.y, m_Rotation.z);
+    rot = XMMatrixRotationRollPitchYaw(m_Rotation.x, m_Rotation.y + XM_PI, m_Rotation.z);
     trans = XMMatrixTranslation(m_Position.x, m_Position.y, m_Position.z);
     world = scale * rot * trans;
 
