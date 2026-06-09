@@ -1,5 +1,6 @@
 #pragma once
 #include <list>
+#include <vector>
 #include "gameObject.h"
 
 class Manager
@@ -35,5 +36,21 @@ public:
 			}
 		}
 		return nullptr;
+	}
+
+	template <typename T>
+	static std::vector<T*> GetGameObjects()
+	{
+		std::vector<T*> gameObjects;
+		for(GameObject* gameObject : m_GameObjects)
+		{ 
+			T* find = dynamic_cast<T*>(gameObject);
+			if (find != nullptr)
+			{
+				gameObjects.push_back(find);
+			}
+			
+		}
+		return gameObjects;
 	}
 };

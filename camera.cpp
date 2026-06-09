@@ -46,11 +46,11 @@ void Camera::Draw()
 	Renderer::SetProjectionMatrix(projection);
 
 	XMFLOAT3 up = XMFLOAT3(0.0f, 1.0f, 0.0f);
-	XMMATRIX view = XMMatrixLookAtLH(XMLoadFloat3((XMFLOAT3*)&m_Position),
+	m_ViewMatrix = XMMatrixLookAtLH(XMLoadFloat3((XMFLOAT3*)&m_Position),
 		XMLoadFloat3((XMFLOAT3*)&m_Target),
 		XMLoadFloat3(&up));
 
-	Renderer::SetViewMatrix(view);
+	Renderer::SetViewMatrix(m_ViewMatrix);
 
 	GameObject::Draw();
 }

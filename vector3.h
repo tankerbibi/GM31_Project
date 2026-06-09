@@ -105,6 +105,11 @@ public:
 		}
 	}
 
+	float length() const
+	{
+		return sqrtf(x * x + y * y + z * z);
+	}
+
 	static Vector3 cross(Vector3& a, Vector3& b) 
 	{
 		return Vector3(a.y * b.z - a.z * b.y,

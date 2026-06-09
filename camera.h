@@ -7,12 +7,15 @@ class Camera : public GameObject
 {
 private:
 	Vector3 m_Target{ 0.0f, 0.0f, 0.0f };
+	XMMATRIX m_ViewMatrix;
 
 public:
 	void Init() override;
 	void Uninit() override;
 	void Update() override;
 	void Draw() override;
+
+	XMMATRIX GetViewMatrix() { return m_ViewMatrix; }
 
 	Vector3 GetForward() override
 	{

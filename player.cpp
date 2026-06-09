@@ -5,6 +5,7 @@
 #include "inputManager.h"
 #include "manager.h"
 #include "camera.h"
+#include "bullet.h"
 
 //m_Position.x += InputManager::IsPressed(InputManager::GameAction::MoveX) * dt;
 using namespace DirectX;
@@ -57,26 +58,35 @@ void Player::Update()
     // 移動方向に回転
     m_Rotation.y = atan2f(m_Velocity.x, m_Velocity.z);
 
-    if (Input::GetKeyTrigger(VK_SPACE))
+    // ジャンプ
+    if (Input::GetKeyTrigger('K'))
         m_Velocity.y += 20.0f;  // 撃力（瞬間的な力）
 
     // 重力
     m_Velocity.y += -60.0f * dt;
 
+    // 抵抗力
     m_Velocity.x += -m_Velocity.x * 5.0f * dt;
     m_Velocity.z += -m_Velocity.z * 5.0f * dt;
 
+    // 位置更新
     m_Position += m_Velocity * dt;
 
+    // 地面に衝突
     if (m_Position.y < 0.0f)
     {
         m_Position.y = 0.0f;
         m_Velocity.y = 0.0f;
     }
 
+    // 弾発射
+    if (Input::GetKeyTrigger('J'))
+    {
+        Bullet* bullet = Manager::AddGameObject<Bullet>();
+        bullet->SetPosition(m_Position);
+        bullet->SetVelocity(GetForward() * 30.0f);
+    }
     GameObject::Update();
-
-    
 }
 
 void Player::Draw()
