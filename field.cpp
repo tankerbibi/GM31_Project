@@ -5,6 +5,8 @@ using namespace DirectX;
 
 void Field::Init()
 {
+    m_Layer = 1;
+
     VERTEX_3D vertex[4];
 
     vertex[0].Position = XMFLOAT3(-30.0f, 0.0f, 30.0f);

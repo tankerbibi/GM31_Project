@@ -4,6 +4,8 @@
 
 void Polygon2D::Init()
 {
+	m_Layer = 3;
+
 	VERTEX_3D vertex[4];
 
 	vertex[0].Position = XMFLOAT3(0.0f, 0.0f, 0.0f);

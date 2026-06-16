@@ -9,6 +9,8 @@ using namespace DirectX;
 
 void Enemy::Init()
 {
+    m_Layer = 1;
+
     m_Position = { -5.0f, 0.0f, 0.0f };
 
     AddComponent<ModelRenderer>(this)->Load("asset\\model\\player.obj");

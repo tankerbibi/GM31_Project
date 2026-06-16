@@ -6,12 +6,14 @@
 #include "enemy.h"
 #include "manager.h"
 #include "explosion.h"
-
+#include "box.h"
 
 using namespace DirectX;
 
 void Bullet::Init()
 {
+    m_Layer = 1;
+
     m_Position = { -5.0f, 0.0f, 0.0f };
 
     AddComponent<ModelRenderer>(this)->Load("asset\\model\\bullet.obj");
@@ -55,6 +57,25 @@ void Bullet::Update()
 
              Manager::AddGameObject<Explosion>()->SetPosition(enemy->GetPosition());
              break;
+        }
+    }
+
+    // ボックスとの衝突判定
+    auto boxes = Manager::GetGameObjects<Box>();
+    for (auto box : boxes)
+    {
+        Vector3 boxPosition = box->GetPosition();
+        Vector3 boxScale = box->GetScale();
+
+        if (boxPosition.x - boxScale.x < m_Position.x && m_Position.x < boxPosition.x + boxScale.x && boxPosition.z - boxScale.z < m_Position.z && m_Position.z < boxPosition.z + boxScale.z)
+        {
+            if (boxPosition.y - boxScale.y < m_Position.y && m_Position.y < boxPosition.y + boxScale.y)
+            {// 側面に衝突
+                SetDestroy();
+
+                Manager::AddGameObject<Explosion>()->SetPosition(m_Position);
+                break;
+            }
         }
     }
 

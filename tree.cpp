@@ -7,6 +7,8 @@ using namespace DirectX;
 
 void Tree::Init()
 {
+    m_Layer = 2;
+
     VERTEX_3D vertex[4];
 
     vertex[0].Position = XMFLOAT3(-4.0f, 10.0f, 0.0f);

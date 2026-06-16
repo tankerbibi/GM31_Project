@@ -7,6 +7,8 @@ using namespace DirectX;
 
 void Explosion::Init()
 {
+    m_Layer = 2;
+
     VERTEX_3D vertex[4];
 
     vertex[0].Position = XMFLOAT3(-1.0f, 1.0f, 0.0f);

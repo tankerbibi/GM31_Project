@@ -5,7 +5,7 @@
 
 class ModelRenderer;
 
-class Player : public GameObject
+class Box : public GameObject
 {
 private:
 	// 速度
@@ -16,9 +16,6 @@ private:
 	ID3D11InputLayout* m_VertexLayout;
 	ID3D11VertexShader* m_VertexShader;
 	ID3D11PixelShader* m_PixelShader;
-	// 接地状態
-	bool m_Ground = true;
-	float m_MoveAnimation = 0.0f;
 
 	//ID3D11ShaderResourceView* m_Texture;
 public:
@@ -27,3 +24,5 @@ public:
 	void Update() override;
 	void Draw() override;
 };
+// プレイヤーは箱庭で逃げまくる
+// プレイヤーは最終的に箱庭の中心を爆発させ、敵をｷﾙする。　

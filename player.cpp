@@ -6,12 +6,16 @@
 #include "manager.h"
 #include "camera.h"
 #include "bullet.h"
+#include "tree.h"
+#include "box.h"
 
 //m_Position.x += InputManager::IsPressed(InputManager::GameAction::MoveX) * dt;
 using namespace DirectX;
 
 void Player::Init()
 {
+    m_Layer = 1;
+
     m_Position = { -5.0f, 0.0f, 0.0f };
 
     AddComponent<ModelRenderer>(this)->Load("asset\\model\\player.obj");
@@ -33,6 +37,8 @@ void Player::Uninit()
 
 void Player::Update()
 {
+    Vector3 oldPosition = m_Position;
+
     // 物理の判定は固定フレームレートがおすすめ。描画は可変フレームレートでもよいけど。
     float dt = 1.0f / 60.0f;
 
@@ -57,10 +63,18 @@ void Player::Update()
 
     // 移動方向に回転
     m_Rotation.y = atan2f(m_Velocity.x, m_Velocity.z);
-
     // ジャンプ
     if (Input::GetKeyTrigger('K'))
+    {
         m_Velocity.y += 20.0f;  // 撃力（瞬間的な力）
+        // スケールアニメーション
+        m_Scale.y = 2.0f;
+        m_Scale.x = 0.5f;
+        m_Scale.z = 0.5f;
+    }
+    m_Scale.x += (1.0f - m_Scale.x) * 0.1f;
+    m_Scale.y += (1.0f - m_Scale.y) * 0.1f;
+    m_Scale.z += (1.0f - m_Scale.z) * 0.1f;
 
     // 重力
     m_Velocity.y += -60.0f * dt;
@@ -71,12 +85,67 @@ void Player::Update()
 
     // 位置更新
     m_Position += m_Velocity * dt;
+    bool oldGround = m_Ground;
+    m_Ground = false;
 
     // 地面に衝突
     if (m_Position.y < 0.0f)
     {
         m_Position.y = 0.0f;
         m_Velocity.y = 0.0f;
+        m_Ground = true;
+    }
+    // 木との衝突判定
+    auto trees = Manager::GetGameObjects<Tree>();
+    for (auto tree : trees)
+    {
+        Vector3 treePosition = tree->GetPosition();
+        Vector3 playerPosition = m_Position;
+        
+        treePosition.y = 0.0f;
+        playerPosition.y = 0.0f;
+        Vector3 direction = playerPosition - treePosition;
+        float length = direction.length();
+        const float collisionRadius = 1.0f;
+        if (length < collisionRadius)
+        {
+            direction /= length;
+            const float overlap = 1.0f - length;
+            direction *= overlap;
+
+            m_Position += direction;
+        }
+    }
+    // ボックスとの衝突判定
+    auto boxes = Manager::GetGameObjects<Box>();
+    for (auto box : boxes)
+    {
+        Vector3 boxPosition = box->GetPosition();
+        Vector3 boxScale = box->GetScale();
+
+        if (boxPosition.x - boxScale.x < m_Position.x && m_Position.x < boxPosition.x + boxScale.x && boxPosition.z - boxScale.z < m_Position.z && m_Position.z < boxPosition.z + boxScale.z)
+        {
+            if (boxPosition.y + boxScale.y < m_Position.y && m_Position.y < boxPosition.y + boxScale.y * 2.0f)
+            {// 上面に衝突
+                m_Position.y = boxPosition.y + boxScale.y * 2.0f;
+                m_Velocity.y = 0.0f;
+                m_Ground = true;
+            }
+            else if (boxPosition.y - boxScale.y < m_Position.y && m_Position.y < boxPosition.y + boxScale.y)
+            {// 側面に衝突
+                m_Position.x = oldPosition.x;
+                m_Position.z = oldPosition.z;
+                m_Velocity.x = 0.0f;
+                m_Velocity.z = 0.0f;
+            }
+        }
+    }
+
+    if (!oldGround && m_Ground)
+    {
+        m_Scale.y = 0.5f;
+        m_Scale.x = 1.5f;
+        m_Scale.z = 1.5f;
     }
 
     // 弾発射
@@ -86,17 +155,24 @@ void Player::Update()
         bullet->SetPosition(m_Position);
         bullet->SetVelocity(GetForward() * 30.0f);
     }
+
+    if (m_Ground)
+    {
+        m_MoveAnimation += m_Velocity.length() * dt;
+        if (m_Velocity.length() > 0.01f)
+        {
+            m_Scale.y += sinf(m_MoveAnimation * 3.0f) * 0.03f;
+        }
+    }
     GameObject::Update();
 }
 
 void Player::Draw()
 {
-    // --------------------------------------------------------
     Renderer::GetDeviceContext()->IASetInputLayout(m_VertexLayout);
 
     Renderer::GetDeviceContext()->VSSetShader(m_VertexShader, nullptr, 0);
     Renderer::GetDeviceContext()->PSSetShader(m_PixelShader, nullptr, 0);
-    // --------------------------------------------------------
     // マトリクス設定
     XMMATRIX world, scale, rot, trans;
     scale = XMMatrixScaling(m_Scale.x, m_Scale.y, m_Scale.z);
@@ -105,23 +181,5 @@ void Player::Draw()
     world = scale * rot * trans;
 
     Renderer::SetWorldMatrix(world);
-    // --------------------------------------------------------
-    //// マテリアル設定
-    //MATERIAL material{};
-    //material.Diffuse = { 1.0f, 1.0f, 1.0f, 1.0f };
-    //material.TextureEnable = true;
-    //Renderer::SetMaterial(material);
-
-    //Renderer::GetDeviceContext()->PSSetShaderResources(0, 1, &m_Texture);
-
-    ////頂点バッファ設定
-    //UINT stride = sizeof(VERTEX_3D);
-    //UINT offset = 0;
-    //Renderer::GetDeviceContext()->IASetVertexBuffers(0, 1, &m_VertexBuffer, &stride, &offset);
-
-    //// ブリミティブトボロジ設定
-    //Renderer::GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-    ////ボリゴン描画
-    //Renderer::GetDeviceContext()->Draw(4, 0);
     GameObject::Draw();
 }

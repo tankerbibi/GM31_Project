@@ -1,20 +1,19 @@
-#include "sky.h"
+#include "box.h"
 #include "input.h"
 #include "renderer.h"
 #include "modelRenderer.h"
 #include "inputManager.h"
-#include "camera.h"
-#include "manager.h"
+
 
 using namespace DirectX;
 
-void Sky::Init()
+void Box::Init()
 {
     m_Layer = 1;
 
     m_Position = { -5.0f, 0.0f, 0.0f };
 
-    AddComponent<ModelRenderer>(this)->Load("asset\\model\\sky.obj");
+    AddComponent<ModelRenderer>(this)->Load("asset\\model\\box.obj");
     // --------------------------------------------------------
     Renderer::CreateVertexShader(&m_VertexShader, &m_VertexLayout,
         "shader\\unlitTextureVS.cso");
@@ -22,28 +21,29 @@ void Sky::Init()
     Renderer::CreatePixelShader(&m_PixelShader,
         "shader\\unlitTexturePS.cso");
     // --------------------------------------------------------
-
-    m_Scale = {500.0f, 500.0f, 500.0f };
 }
 
-void Sky::Uninit()
+void Box::Uninit()
 {
     SAFE_RELEASE(m_PixelShader);
     SAFE_RELEASE(m_VertexShader);
     SAFE_RELEASE(m_VertexLayout);
 }
 
-void Sky::Update()
+void Box::Update()
 {
     // 物理の判定は固定フレームレートがおすすめ。描画は可変フレームレートでもよいけど。
     float dt = 1.0f / 60.0f;
 
-    Camera* camera = Manager::GetGameObject<Camera>();
+    // m_Velocity += Vector3(5.0f, 0.0f, 0.0f) * dt;
+    // m_Position += m_Velocity * dt;
 
-    m_Position = { camera->GetPosition().x, camera->GetPosition().y - 40.0f, camera->GetPosition().z };
+    /*if (Input::GetKeyPress('D'))
+        m_Position.x += 1.0f * dt;*/
+    m_Position.x += InputManager::IsPressed(InputManager::GameAction::MoveX) * dt;
 }
 
-void Sky::Draw()
+void Box::Draw()
 {
     // --------------------------------------------------------
     Renderer::GetDeviceContext()->IASetInputLayout(m_VertexLayout);
@@ -59,6 +59,23 @@ void Sky::Draw()
     world = scale * rot * trans;
 
     Renderer::SetWorldMatrix(world);
+    // -------------------------------------------------------- 
+    //// マテリアル設定
+    //MATERIAL material{};
+    //material.Diffuse = { 1.0f, 1.0f, 1.0f, 1.0f };
+    //material.TextureEnable = true;
+    //Renderer::SetMaterial(material);
 
+    //Renderer::GetDeviceContext()->PSSetShaderResources(0, 1, &m_Texture);
+
+    ////頂点バッファ設定
+    //UINT stride = sizeof(VERTEX_3D);
+    //UINT offset = 0;
+    //Renderer::GetDeviceContext()->IASetVertexBuffers(0, 1, &m_VertexBuffer, &stride, &offset);
+
+    //// ブリミティブトボロジ設定
+    //Renderer::GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+    ////ボリゴン描画
+    //Renderer::GetDeviceContext()->Draw(4, 0);
     GameObject::Draw();
 }

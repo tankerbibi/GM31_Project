@@ -110,6 +110,11 @@ public:
 		return sqrtf(x * x + y * y + z * z);
 	}
 
+	static float dot(Vector3& lhs, Vector3& rhs)
+	{
+		return lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z;
+	}
+
 	static Vector3 cross(Vector3& a, Vector3& b) 
 	{
 		return Vector3(a.y * b.z - a.z * b.y,

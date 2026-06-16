@@ -12,6 +12,7 @@
 #include "tree.h"
 #include "explosion.h"
 #include "sky.h"
+#include "box.h"
 
 // staticメンバ変数は、.cpp側で宣言する必要がある。
 std::list<GameObject*> Manager::m_GameObjects;
@@ -26,6 +27,9 @@ void Manager::Init()
 	
 	AddGameObject<Sky>();
 	AddGameObject<Field>();
+	Box* box = AddGameObject<Box>();
+	box->SetPosition({ -20.0f, 0.0f, -3.0f });
+	box->SetScale({ 5.0f, 2.0f, 5.0f });
 	AddGameObject<Player>();
 	AddGameObject<Enemy>()->SetPosition({-2.0f, 0.0f, 1.0f});
 	AddGameObject<Enemy>()->SetPosition({-0.0f, 0.0f, 1.0f});
@@ -73,11 +77,29 @@ void Manager::Draw()
 {
 	Renderer::Begin();
 
-	for (GameObject* gameObject : m_GameObjects)
+	Camera* camera = GetGameObject<Camera>();
+	Vector3 forward = camera->GetForward();
+	Vector3 position = camera->GetPosition();
+	// すべてにZを計算しているので少し効率が悪い
+	for (GameObject* gameOject : m_GameObjects)
 	{
-		gameObject->Draw();
+		gameOject->CalcCameraZ(position, forward);
 	}
 
+	// Zソート
+	m_GameObjects.sort([](GameObject* a, GameObject* b)
+	{
+			return a->GetCameraZ() > b->GetCameraZ();
+	});
+	for (int layer = 0; layer < 4; layer++)
+	{
+		float distance = 0.0f;
+		for (GameObject* gameObject : m_GameObjects)
+		{
+			if(gameObject->GetLayer() == layer)
+				gameObject->Draw();
+		}
+	}
 	Renderer::End();
 }
 
