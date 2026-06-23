@@ -2,28 +2,28 @@
 #include "renderer.h"
 #include "polygon2D.h"
 
-void Polygon2D::Init()
+void Polygon2D::Init(float x, float y , float width, float height, const WCHAR* textureName)
 {
 	m_Layer = 3;
 
 	VERTEX_3D vertex[4];
 
-	vertex[0].Position = XMFLOAT3(0.0f, 0.0f, 0.0f);
+	vertex[0].Position = XMFLOAT3(x, y, 0.0f);
 	vertex[0].Normal = XMFLOAT3(0.0f, 0.0f, 0.0f);
 	vertex[0].Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	vertex[0].TexCoord = XMFLOAT2(0.0f, 0.0f);
 
-	vertex[1].Position = XMFLOAT3(200.0f, 0.0f, 0.0f);
+	vertex[1].Position = XMFLOAT3(x + width, y, 0.0f);
 	vertex[1].Normal = XMFLOAT3(0.0f, 0.0f, 0.0f);
 	vertex[1].Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	vertex[1].TexCoord = XMFLOAT2(1.0f, 0.0f);
 
-	vertex[2].Position = XMFLOAT3(0.0f, 200.0f, 0.0f);
+	vertex[2].Position = XMFLOAT3(x, y + height, 0.0f);
 	vertex[2].Normal = XMFLOAT3(0.0f, 0.0f, 0.0f);
 	vertex[2].Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	vertex[2].TexCoord = XMFLOAT2(0.0f, 1.0f);
 
-	vertex[3].Position = XMFLOAT3(200.0f, 200.0f, 0.0f);
+	vertex[3].Position = XMFLOAT3(x + width, y + height, 0.0f);
 	vertex[3].Normal = XMFLOAT3(0.0f, 0.0f, 0.0f);
 	vertex[3].Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	vertex[3].TexCoord = XMFLOAT2(1.0f, 1.0f);
@@ -47,7 +47,7 @@ void Polygon2D::Init()
 
 	TexMetadata metadata;
 	ScratchImage image;
-	HRESULT hr = LoadFromWICFile(L"asset\\texture\\Block_Orrange.png", WIC_FLAGS_NONE, &metadata, image);
+	HRESULT hr = LoadFromWICFile(textureName, WIC_FLAGS_NONE, &metadata, image);
 	CreateShaderResourceView(Renderer::GetDevice(), image.GetImages(), image.GetImageCount(), metadata, &m_Texture);
 
 	assert(m_Texture);

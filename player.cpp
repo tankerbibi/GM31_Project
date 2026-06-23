@@ -8,6 +8,8 @@
 #include "bullet.h"
 #include "tree.h"
 #include "box.h"
+#include "enemy.h"
+#include "result.h"
 
 //m_Position.x += InputManager::IsPressed(InputManager::GameAction::MoveX) * dt;
 using namespace DirectX;

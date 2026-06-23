@@ -1,11 +1,12 @@
 #pragma once
 #include "main.h"
+#include "vector3.h"
 #include "gameObject.h"
 
-class Polygon2D : public GameObject
+class Particle : public GameObject
 {
 private:
-	ID3D11Buffer * m_VertexBuffer;
+	ID3D11Buffer* m_VertexBuffer;
 
 	ID3D11InputLayout* m_VertexLayout;
 	ID3D11VertexShader* m_VertexShader;
@@ -13,10 +14,19 @@ private:
 
 	ID3D11ShaderResourceView* m_Texture;
 
+	struct PARTICLE
+	{
+		bool Enable;
+		int Life;
+		Vector3 Position;
+		Vector3 Velocity;
+	};
+
+	static const int PARTICLE_MAX = 10000;
+	PARTICLE m_Particle[PARTICLE_MAX];
+
 public:
-	void Init() override {};
-	//using GameObject::Init;
-	void Init(float x, float y, float width, float height, const WCHAR* textureName);
+	void Init() override;
 	void Uninit() override;
 	void Update() override;
 	void Draw() override;
