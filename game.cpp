@@ -16,6 +16,7 @@
 #include "box.h"
 #include "particle.h"
 #include "result.h"
+#include "score.h"
 
 
 void Game::Init()
@@ -41,6 +42,7 @@ void Game::Init()
 	Manager::AddGameObject<Explosion>();
 
 	Manager::AddGameObject<Polygon2D>()->Init(0.0f, 0.0f, 200.0f, 200.0f, L"asset\\texture\\Windows.png");
+	Manager::AddGameObject<Score>()->SetPosition({ 100.0f, 100.0f, 0.0f });
 
 	// AddGameObject<Polygon2D>();
 }

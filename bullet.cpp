@@ -7,6 +7,7 @@
 #include "manager.h"
 #include "explosion.h"
 #include "box.h"
+#include "score.h"
 
 using namespace DirectX;
 
@@ -56,6 +57,8 @@ void Bullet::Update()
              SetDestroy();
 
              Manager::AddGameObject<Explosion>()->SetPosition(enemy->GetPosition());
+
+             Manager::GetGameObject<Score>()->Add(1);
              break;
         }
     }

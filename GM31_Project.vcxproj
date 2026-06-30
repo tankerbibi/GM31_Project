@@ -127,6 +127,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="audio.h" />
     <ClInclude Include="box.h" />
     <ClInclude Include="bullet.h" />
     <ClInclude Include="camera.h" />
@@ -147,6 +148,7 @@
     <ClInclude Include="renderer.h" />
     <ClInclude Include="result.h" />
     <ClInclude Include="scene.h" />
+    <ClInclude Include="score.h" />
     <ClInclude Include="sky.h" />
     <ClInclude Include="texture.h" />
     <ClInclude Include="title.h" />
@@ -154,6 +156,7 @@
     <ClInclude Include="vector3.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="audio.cpp" />
     <ClCompile Include="box.cpp" />
     <ClCompile Include="bullet.cpp" />
     <ClCompile Include="camera.cpp" />
@@ -174,6 +177,7 @@
     <ClCompile Include="renderer.cpp" />
     <ClCompile Include="result.cpp" />
     <ClCompile Include="scene.cpp" />
+    <ClCompile Include="score.cpp" />
     <ClCompile Include="sky.cpp" />
     <ClCompile Include="texture.cpp" />
     <ClCompile Include="title.cpp" />

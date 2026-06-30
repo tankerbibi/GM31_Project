@@ -10,6 +10,7 @@
 #include "box.h"
 #include "enemy.h"
 #include "result.h"
+#include "audio.h"
 
 //m_Position.x += InputManager::IsPressed(InputManager::GameAction::MoveX) * dt;
 using namespace DirectX;
@@ -28,6 +29,11 @@ void Player::Init()
     Renderer::CreatePixelShader(&m_PixelShader,
         "shader\\unlitTexturePS.cso");
     // --------------------------------------------------------
+
+    m_JumpSE = AddComponent<Audio>(this);
+    m_JumpSE->Load("asset\\audio\\wan.wav");
+    GameObject::Init();
+
 }
 
 void Player::Uninit()
@@ -35,6 +41,7 @@ void Player::Uninit()
     SAFE_RELEASE(m_PixelShader);
     SAFE_RELEASE(m_VertexShader);
     SAFE_RELEASE(m_VertexLayout);
+    GameObject::Uninit();
 }
 
 void Player::Update()
@@ -73,6 +80,8 @@ void Player::Update()
         m_Scale.y = 2.0f;
         m_Scale.x = 0.5f;
         m_Scale.z = 0.5f;
+
+        m_JumpSE->Play();
     }
     m_Scale.x += (1.0f - m_Scale.x) * 0.1f;
     m_Scale.y += (1.0f - m_Scale.y) * 0.1f;

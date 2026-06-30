@@ -1,6 +1,7 @@
 #include "main.h"
 #include "manager.h"
 #include "input.h"
+#include "audio.h"
 #include "inputManager.h"
 #include "renderer.h"
 #include "camera.h"
@@ -17,7 +18,8 @@ void Manager::Init()
 {
 	Input::Init();
 	Renderer::Init();
-	
+	Audio::InitMaster();
+
 	ChangeScene<Title>();
 }
 
@@ -35,6 +37,7 @@ void Manager::Uninit()
 		delete gameObject;
 	}
 	m_GameObjects.clear();
+	Audio::UninitMaster();
 	Renderer::Uninit();
 	Input::Uninit();
 	

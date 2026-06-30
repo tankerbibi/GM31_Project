@@ -1,5 +1,6 @@
 #include "field.h"
 #include "renderer.h"
+#include "audio.h"
 
 using namespace DirectX;
 
@@ -52,8 +53,12 @@ void Field::Init()
     ScratchImage image;
     HRESULT hr = LoadFromWICFile(L"asset\\texture\\Block_Fragile.png", WIC_FLAGS_NONE, &metadata, image);
     CreateShaderResourceView(Renderer::GetDevice(), image.GetImages(), image.GetImageCount(), metadata, &m_Texture);
-
     assert(m_Texture);
+    // BGM再生
+    Audio* bgm = AddComponent<Audio>(this);
+    bgm->Load("asset\\audio\\bgm.wav");
+    bgm->Play(true);
+    GameObject::Init();
 }
 
 void Field::Uninit()
@@ -63,11 +68,14 @@ void Field::Uninit()
     SAFE_RELEASE(m_VertexShader);
     SAFE_RELEASE(m_VertexLayout);
     SAFE_RELEASE(m_VertexBuffer);
+
+    GameObject::Uninit();
 }
 
 void Field::Update()
 {
     // 今は特に何もしない
+    GameObject::Update();
 }
 
 void Field::Draw()
@@ -103,6 +111,8 @@ void Field::Draw()
     Renderer::GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
     //ボリゴン描画
     Renderer::GetDeviceContext()->Draw(4, 0);
+
+    GameObject::Draw();
 }
 
 // パーティクルを表面にくっつけることもできるらしい。 ベクターフィールド、うねうねパーティクル作れる。ブルームっていうポストエフェクトかけると花火がきれいになる。
