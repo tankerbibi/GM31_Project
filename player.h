@@ -2,6 +2,7 @@
 #include "main.h"
 #include "vector3.h"
 #include "gameObject.h"
+#include "animationModel.h"
 
 class ModelRenderer;
 class Audio;
@@ -19,6 +20,8 @@ private:
 	// 接地状態
 	bool m_Ground = true;
 	float m_MoveAnimation = 0.0f;
+	class AnimationModel* m_AnimationModel;
+	int m_AnimationFrame = 0;
 
 	Audio* m_JumpSE;
 

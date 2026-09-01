@@ -14,12 +14,17 @@
 
 //m_Position.x += InputManager::IsPressed(InputManager::GameAction::MoveX) * dt;
 using namespace DirectX;
-
+// 3Dの世界で親子関係を作るためには、マトリクスをかける。
 void Player::Init()
 {
     m_Layer = 1;
 
     m_Position = { -5.0f, 0.0f, 0.0f };
+    m_Scale = { 0.01f, 0.01f, 0.01f };
+
+    m_AnimationModel = AddComponent < AnimationModel>(this);
+	m_AnimationModel->Load("asset\\model\\Akai.fbx");
+	m_AnimationModel->LoadAnimation("asset\\model\\Akai_Run.fbx", "Run");
 
     AddComponent<ModelRenderer>(this)->Load("asset\\model\\player.obj");
     // --------------------------------------------------------
@@ -77,15 +82,15 @@ void Player::Update()
     {
         m_Velocity.y += 20.0f;  // 撃力（瞬間的な力）
         // スケールアニメーション
-        m_Scale.y = 2.0f;
-        m_Scale.x = 0.5f;
-        m_Scale.z = 0.5f;
+        //m_Scale.y = 2.0f;
+        //m_Scale.x = 0.5f;
+        //m_Scale.z = 0.5f;
 
         m_JumpSE->Play();
     }
-    m_Scale.x += (1.0f - m_Scale.x) * 0.1f;
-    m_Scale.y += (1.0f - m_Scale.y) * 0.1f;
-    m_Scale.z += (1.0f - m_Scale.z) * 0.1f;
+    //m_Scale.x += (1.0f - m_Scale.x) * 0.1f;
+    //m_Scale.y += (1.0f - m_Scale.y) * 0.1f;
+    //m_Scale.z += (1.0f - m_Scale.z) * 0.1f;
 
     // 重力
     m_Velocity.y += -60.0f * dt;
@@ -154,9 +159,9 @@ void Player::Update()
 
     if (!oldGround && m_Ground)
     {
-        m_Scale.y = 0.5f;
-        m_Scale.x = 1.5f;
-        m_Scale.z = 1.5f;
+        //m_Scale.y = 0.5f;
+        //m_Scale.x = 1.5f;
+        //m_Scale.z = 1.5f;
     }
 
     // 弾発射
@@ -172,9 +177,10 @@ void Player::Update()
         m_MoveAnimation += m_Velocity.length() * dt;
         if (m_Velocity.length() > 0.01f)
         {
-            m_Scale.y += sinf(m_MoveAnimation * 3.0f) * 0.03f;
+            //m_Scale.y += sinf(m_MoveAnimation * 3.0f) * 0.03f;
         }
     }
+    m_AnimationFrame++;
     GameObject::Update();
 }
 
@@ -192,5 +198,8 @@ void Player::Draw()
     world = scale * rot * trans;
 
     Renderer::SetWorldMatrix(world);
+
+	m_AnimationModel->Update("Run", m_AnimationFrame);
+
     GameObject::Draw();
 }

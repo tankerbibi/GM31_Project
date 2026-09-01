@@ -90,6 +90,15 @@
     <ClInclude Include="result.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="audio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="score.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="animationModel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="manager.cpp">
@@ -162,6 +171,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="result.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="audio.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="score.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="animationModel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
