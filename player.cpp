@@ -8,6 +8,7 @@
 #include "bullet.h"
 #include "tree.h"
 #include "box.h"
+#include "button.h"
 #include "enemy.h"
 #include "result.h"
 #include "audio.h"
@@ -24,7 +25,11 @@ void Player::Init()
 
     m_AnimationModel = AddComponent < AnimationModel>(this);
 	m_AnimationModel->Load("asset\\model\\Akai.fbx");
+	m_AnimationModel->LoadAnimation("asset\\model\\Akai_Idle.fbx", "Idle");
 	m_AnimationModel->LoadAnimation("asset\\model\\Akai_Run.fbx", "Run");
+
+    m_AnimationName = "Idle";
+    m_NextAnimationName = "Idle";
 
     AddComponent<ModelRenderer>(this)->Load("asset\\model\\player.obj");
     // --------------------------------------------------------
@@ -66,17 +71,42 @@ void Player::Update()
     right.y = 0.0f;
     right.normalize();
 
-    if (Input::GetKeyPress('D'))
-        m_Velocity += right * 40.0f * dt;
-    if (Input::GetKeyPress('A'))
-        m_Velocity -= right * 40.0f * dt;
-    if (Input::GetKeyPress('W'))
-        m_Velocity += forward * 40.0f * dt;
-    if (Input::GetKeyPress('S'))
-        m_Velocity -= forward *  40.0f * dt;
+    bool move = false;
+    if (!m_Ground)
+    {
+        if (Input::GetKeyPress('D'))
+        {
+            move = true;
+            m_Velocity += right * 40.0f * dt;
+        }
+        if (Input::GetKeyPress('A'))
+        {
+            move = true;
+            m_Velocity -= right * 40.0f * dt;
+        }
+        if (Input::GetKeyPress('W'))
+        {
+            m_Velocity += forward * 40.0f * dt;
+            move = true;
+        }
+        if (Input::GetKeyPress('S'))
+        {
+            m_Velocity -= forward * 40.0f * dt;
+            move = true;
+        }
+    }
+    
+    if (move)
+    {
+		SetAnimation("Run");
+        // 移動方向に回転
+        m_Rotation.y = atan2f(m_Velocity.x, m_Velocity.z);
+	}
+    else
+    {
+        SetAnimation("Idle");
+    }
 
-    // 移動方向に回転
-    m_Rotation.y = atan2f(m_Velocity.x, m_Velocity.z);
     // ジャンプ
     if (Input::GetKeyTrigger('K'))
     {
@@ -93,7 +123,7 @@ void Player::Update()
     //m_Scale.z += (1.0f - m_Scale.z) * 0.1f;
 
     // 重力
-    m_Velocity.y += -60.0f * dt;
+    m_Velocity.y += -15.0f * dt;
 
     // 抵抗力
     m_Velocity.x += -m_Velocity.x * 5.0f * dt;
@@ -157,6 +187,33 @@ void Player::Update()
         }
     }
 
+    // ボタンとの衝突判定
+    auto buttons = Manager::GetGameObjects<Button>();
+    for (auto button : buttons)
+    {
+        Vector3 buttonPosition = button->GetPosition();
+        Vector3 buttonScale = button->GetScale();
+
+        if (buttonPosition.x - buttonScale.x < m_Position.x && m_Position.x < buttonPosition.x + buttonScale.x && buttonPosition.z - buttonScale.z < m_Position.z && m_Position.z < buttonPosition.z + buttonScale.z)
+        {
+            if (buttonPosition.y + buttonScale.y < m_Position.y && m_Position.y < buttonPosition.y + buttonScale.y * 2.0f)
+            {// 上面に衝突
+                m_Position.y = buttonPosition.y + buttonScale.y * 2.0f;
+                m_Velocity.y = 0.0f;
+                m_Ground = true;
+                button->PushButton();
+            }
+            else if (buttonPosition.y - buttonScale.y < m_Position.y && m_Position.y < buttonPosition.y + buttonScale.y)
+            {// 側面に衝突
+                m_Position.x = oldPosition.x;
+                m_Position.z = oldPosition.z;
+                m_Velocity.x = 0.0f;
+                m_Velocity.z = 0.0f;
+            }
+        }
+    }
+
+
     if (!oldGround && m_Ground)
     {
         //m_Scale.y = 0.5f;
@@ -181,6 +238,14 @@ void Player::Update()
         }
     }
     m_AnimationFrame++;
+    m_NextAnimationFrame++;
+
+    m_Blend += 0.1f;
+    if (m_Blend > 1.0f)
+    {
+        m_Blend = 1.0f;
+    }
+
     GameObject::Update();
 }
 
@@ -193,13 +258,27 @@ void Player::Draw()
     // マトリクス設定
     XMMATRIX world, scale, rot, trans;
     scale = XMMatrixScaling(m_Scale.x, m_Scale.y, m_Scale.z);
-    rot = XMMatrixRotationRollPitchYaw(m_Rotation.x, m_Rotation.y + XM_PI, m_Rotation.z);
+    rot = XMMatrixRotationRollPitchYaw(m_Rotation.x, m_Rotation.y, m_Rotation.z);
     trans = XMMatrixTranslation(m_Position.x, m_Position.y, m_Position.z);
     world = scale * rot * trans;
 
     Renderer::SetWorldMatrix(world);
 
-	m_AnimationModel->Update("Run", m_AnimationFrame);
+	m_AnimationModel->Update(m_AnimationName.c_str(), m_AnimationFrame, m_NextAnimationName.c_str(), m_NextAnimationFrame, m_Blend);
 
     GameObject::Draw();
+}
+
+void Player::SetAnimation(const char* AnimationName)
+{
+    if (m_NextAnimationName != AnimationName)
+    {
+		m_AnimationName = m_NextAnimationName;
+        m_AnimationFrame = m_NextAnimationFrame;
+
+        m_NextAnimationName = AnimationName;
+        m_NextAnimationFrame = 0;
+
+        m_Blend = 0.0f;
+    }
 }

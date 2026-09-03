@@ -131,6 +131,7 @@
     <ClInclude Include="audio.h" />
     <ClInclude Include="box.h" />
     <ClInclude Include="bullet.h" />
+    <ClInclude Include="button.h" />
     <ClInclude Include="camera.h" />
     <ClInclude Include="component.h" />
     <ClInclude Include="enemy.h" />
@@ -161,6 +162,7 @@
     <ClCompile Include="audio.cpp" />
     <ClCompile Include="box.cpp" />
     <ClCompile Include="bullet.cpp" />
+    <ClCompile Include="button.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="enemy.cpp" />
     <ClCompile Include="explosion.cpp" />

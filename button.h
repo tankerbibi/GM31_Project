@@ -2,12 +2,10 @@
 #include "main.h"
 #include "vector3.h"
 #include "gameObject.h"
-#include "animationModel.h"
-#include <string>
 
 class ModelRenderer;
-class Audio;
-class Player : public GameObject
+
+class Button : public GameObject
 {
 private:
 	// 速度
@@ -18,20 +16,8 @@ private:
 	ID3D11InputLayout* m_VertexLayout;
 	ID3D11VertexShader* m_VertexShader;
 	ID3D11PixelShader* m_PixelShader;
-	// 接地状態
-	bool m_Ground = true;
-	float m_MoveAnimation = 0.0f;
-	class AnimationModel* m_AnimationModel;
-	int m_AnimationFrame = 0;
-	std::string m_AnimationName;
 
-	int m_NextAnimationFrame = 0;
-	std::string m_NextAnimationName;
-
-	float m_Blend = 0.0f;
-
-	Audio* m_JumpSE;
-
+	int m_PushedFrame = 0;
 	//ID3D11ShaderResourceView* m_Texture;
 public:
 	void Init() override;
@@ -39,5 +25,8 @@ public:
 	void Update() override;
 	void Draw() override;
 
-	void SetAnimation(const char* AnimationName);
+
+	void PushButton();
 };
+// プレイヤーは箱庭で逃げまくる
+// プレイヤーは最終的に箱庭の中心を爆発させ、敵をｷﾙする。　

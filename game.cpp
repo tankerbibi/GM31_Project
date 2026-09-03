@@ -17,6 +17,7 @@
 #include "particle.h"
 #include "result.h"
 #include "score.h"
+#include "button.h"
 
 
 void Game::Init()
@@ -30,6 +31,12 @@ void Game::Init()
 	Box* box = Manager::AddGameObject<Box>();
 	box->SetPosition({ -20.0f, 0.0f, -3.0f });
 	box->SetScale({ 5.0f, 2.0f, 5.0f });
+
+	Button* button = Manager::AddGameObject<Button>();
+	button->SetPosition({ 0.0f, 0.0f, -3.0f });
+	button->SetScale({ 1.0f, 1.0f, 1.0f });
+
+
 	Manager::AddGameObject<Player>();
 	Manager::AddGameObject<Enemy>()->SetPosition({ -2.0f, 0.0f, 1.0f });
 	Manager::AddGameObject<Enemy>()->SetPosition({ -0.0f, 0.0f, 1.0f });
